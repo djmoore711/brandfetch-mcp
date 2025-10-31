@@ -1,0 +1,58 @@
+
+# Added by cleanup script
+# Build artifacts
+# Environment variables
+# IDE
+# Python
+# Ruff
+# Testing
+# Virtual Environment
+# mypy
+*$py.class
+*.egg
+*.egg-info/
+*.log
+*.pot
+*.py[cod]
+*.pyc
+*.so
+*.swo
+*.swp
+*~
+.DS_Store
+.Python
+.coverage
+.dmypy.json
+.eggs/
+.env
+.env.*
+.env.example
+.env.local
+.idea/
+.installed.cfg
+.mypy_cache/
+.pytest_cache
+.pytest_cache/
+.ruff_cache/
+.tox/
+.venv/
+.vscode/
+ENV/
+__pycache__
+__pycache__/
+build/
+develop-eggs/
+dist/
+dmypy.json
+downloads/
+eggs/
+env/
+htmlcov/
+lib/
+lib64/
+parts/
+sdist/
+uv.lock
+var/
+venv/
+wheels/
