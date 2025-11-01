@@ -1,58 +1,69 @@
-
-# Added by cleanup script
-# Build artifacts
-# Environment variables
-# IDE
-# Python
-# Ruff
-# Testing
-# Virtual Environment
-# mypy
-*$py.class
-*.egg
-*.egg-info/
-*.log
-*.pot
-*.py[cod]
-*.pyc
-*.so
-*.swo
-*.swp
-*~
-.DS_Store
-.Python
-.coverage
-.dmypy.json
-.eggs/
+# Environment
 .env
 .env.*
-.env.example
 .env.local
-.idea/
-.installed.cfg
-.mypy_cache/
-.pytest_cache
-.pytest_cache/
-.ruff_cache/
-.tox/
-.venv/
-.vscode/
-ENV/
-__pycache__
+cleanup-quarantine/
+
+# Python
 __pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+*.so
+
+# Build / packaging
 build/
-develop-eggs/
 dist/
-dmypy.json
-downloads/
-eggs/
-env/
-htmlcov/
-lib/
-lib64/
+*.egg
+*.egg-info/
+wheels/
 parts/
 sdist/
-uv.lock
-var/
+develop-eggs/
+eggs/
+
+# Virtualenvs
+.venv/
 venv/
-wheels/
+env/
+ENV/
+
+# Testing / coverage / caches
+.pytest_cache/
+.coverage
+htmlcov/
+dmypy.json
+.mypy_cache/
+.ruff_cache/
+.tox/
+
+# Logs and temp
+*.log
+*.tmp
+*~
+*.bak
+*.swp
+*.swo
+
+# IDEs / editors
+.vscode/
+.idea/
+.installed.cfg
+# JetBrains caches
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Misc
+uv.lock
+lib/
+lib64/
+downloads/
+var/
+
+# Optional / common additions
+.ipynb_checkpoints/
+.python-version
