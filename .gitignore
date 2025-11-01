@@ -67,3 +67,5 @@ var/
 # Optional / common additions
 .ipynb_checkpoints/
 .python-version
+# Allow the example env template to be tracked
+!/.env.example
