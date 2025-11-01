@@ -38,6 +38,10 @@ dmypy.json
 .ruff_cache/
 .tox/
 
+# Databases
+*.db
+brand_api_usage.db
+
 # Logs and temp
 *.log
 *.tmp
@@ -50,6 +54,7 @@ dmypy.json
 .vscode/
 .idea/
 .installed.cfg
+.windsurf/
 # JetBrains caches
 *.iml
 

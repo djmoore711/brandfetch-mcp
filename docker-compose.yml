@@ -1,0 +1,10 @@
+version: '3.8'
+
+services:
+  brandfetch-mcp:
+    build: .
+    environment:
+      - BRANDFETCH_API_KEY=${BRANDFETCH_API_KEY}
+    volumes:
+      - ./src:/app/src
+    restart: unless-stopped
