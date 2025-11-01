@@ -65,7 +65,8 @@ check_gitignore_pattern() {
     local pattern="$1"
     
     # Escape special characters for pattern matching
-    local escaped_pattern=$(echo "$pattern" | sed 's/\*/\\*/g' | sed 's/\./\\./g')
+    local escaped_pattern
+    escaped_pattern=$(echo "$pattern" | sed 's/\*/\\*/g' | sed 's/\./\\./g')
     
     # Try different pattern matching approaches
     if grep -q "^$pattern" .gitignore 2>/dev/null || \
@@ -129,7 +130,7 @@ main() {
         
         if [[ -z "${SKIP_INTERACTIVE:-}" && -z "${DRY_RUN:-}" ]]; then
             echo ""
-            read -p "Type 'understood' to continue: " && [[ $REPLY == "understood" ]] || exit 1
+            read -r -p "Type 'understood' to continue: " && [[ $REPLY == "understood" ]] || exit 1
         elif [[ -n "${SKIP_INTERACTIVE:-}" ]]; then
             echo "SKIP_INTERACTIVE set - continuing without confirmation"
         fi
