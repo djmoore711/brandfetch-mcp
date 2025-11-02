@@ -98,6 +98,9 @@ main() {
     # Pre-flight checks
     print_status "Pre-flight checks"
     
+    # Initialize variables
+    : "${DRY_RUN:=}"
+    
     # Check for uncommitted changes
     if ! git diff --quiet || ! git diff --cached --quiet; then
         print_warning "You have uncommitted changes!"
@@ -113,7 +116,7 @@ main() {
     git status --porcelain
     
     echo ""
-    if [[ -n "$DRY_RUN" ]]; then
+    if [[ -n "${DRY_RUN:-}" ]]; then
         print_status "DRY RUN MODE - Showing what would be removed without executing"
     fi
     
