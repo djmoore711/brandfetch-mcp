@@ -76,3 +76,36 @@ var/
 !/.env.example
 .shellcheckrc
 .snyk
+
+# Editors and IDEs
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# macOS
+.DS_Store
+
+# Python development
+.mypy_cache/
+.pytype/
+.ruff_cache/
+
+# Test and coverage artifacts
+htmlcov/
+.coverage.*
+.coverage
+*.cover
+*.py,cover
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Build artifacts
+__pypackages__/
+
+# Documentation
+_build/

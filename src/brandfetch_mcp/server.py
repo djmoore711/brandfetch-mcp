@@ -7,9 +7,13 @@ import httpx
 from mcp.server import Server
 from mcp.types import Tool, TextContent
 from pydantic import AnyUrl
+from dotenv import load_dotenv
 
-from .brand_logo import get_logo_url
+# Load environment variables from .env file
+load_dotenv()
+
 from .client import BrandfetchClient
+from . import brandfetch_logo_lookup_checked
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -20,6 +24,7 @@ app = Server("brandfetch-mcp")
 
 # Initialize Brandfetch client
 try:
+    # Create the BrandfetchClient instance
     brandfetch = BrandfetchClient()
     logger.info("Brandfetch client initialized successfully")
 except ValueError as e:
@@ -305,121 +310,112 @@ async def list_tools() -> list[Tool]:
         ),
 
     ]
+
+
+@app.call_tool()
 async def call_tool(name: str, arguments: Dict[str, Any]) -> list[TextContent]:
     """Handle tool execution requests."""
     try:
         if name == "get_brand_details":
             domain = arguments["domain"]
-            logger.info(f"Fetching brand details for: {domain}")
             result = await brandfetch.get_brand(domain)
+            
+            # Format nicely for Claude
             formatted = format_brand_details(result)
             return [TextContent(type="text", text=formatted)]
-
+        
         elif name == "search_brands":
             query = arguments["query"]
             limit = arguments.get("limit", 10)
-            logger.info(f"Searching brands for: {query} (limit: {limit})")
-            result = await brandfetch.search_brands(query, limit)
-            formatted = format_search_results(result)
+            results = await brandfetch.search_brands(query, limit)
+            
+            # Format search results
+            formatted = format_search_results(results)
             return [TextContent(type="text", text=formatted)]
-
+        
         elif name == "get_brand_logo":
             domain = arguments["domain"]
-            format = arguments.get("format", "svg")
+            format_type = arguments.get("format", "svg")
             theme = arguments.get("theme", "light")
             logo_type = arguments.get("type", "logo")
-            logger.info(f"Fetching {format} logo for: {domain} (theme: {theme}, type: {logo_type})")
-            result = await brandfetch.get_brand_logo(domain, format, theme, logo_type)
-            formatted = format_logo_response(result)
+            
+            logo = await brandfetch.get_brand_logo(domain, format_type, theme, logo_type)
+            
+            # Format logo response
+            formatted = format_logo_response(logo)
             return [TextContent(type="text", text=formatted)]
-
+        
         elif name == "get_brand_colors":
             domain = arguments["domain"]
-            logger.info(f"Fetching brand colors for: {domain}")
-            result = await brandfetch.get_brand_colors(domain)
-            formatted = format_colors_response(result)
+            colors = await brandfetch.get_brand_colors(domain)
+            
+            # Format colors response
+            formatted = format_colors_response(colors)
             return [TextContent(type="text", text=formatted)]
-
+        
         elif name == "get_logo_url":
+            # Use the brandfetch_logo_lookup_checked module
             domain = arguments.get("domain")
             name_param = arguments.get("name")
-            logger.info(f"Getting logo URL for domain='{domain}' or name='{name_param}'")
             
-            # Use the new high-quota logo lookup strategy
-            try:
-                from .brandfetch_logo_lookup_checked import get_logo_for_domain
-                
-                # If domain is provided, use it directly; otherwise use name as company hint
-                if domain:
-                    result = await get_logo_for_domain(domain)
-                elif name_param:
-                    # Try to generate domain from name or use as company hint
-                    result = await get_logo_for_domain(name_param, company_hint=name_param)
-                else:
-                    raise ValueError("Either domain or name must be provided")
-                
-                if "logo_url" in result:
-                    response = f"**Logo URL:** {result['logo_url']}\n**Source:** {result['source']}\n**Reason:** {result['reason']}"
-                    if result.get("warning"):
-                        response += f"\n**Warning:** {result['warning']}"
-                    response += f"\n**Brand API calls this month:** {result.get('brand_api_calls_this_month', 0)}"
-                elif "error" in result:
-                    if result["error"] == "brand_api_limit_reached":
-                        response = f"❌ **Brand API limit reached** ({result.get('brand_api_calls_this_month', 0)} calls). Try again next month."
-                    elif result["error"] == "no_logo_found":
-                        response = f"❌ **No logo found** for the specified domain/name."
-                    else:
-                        response = f"❌ **Error:** {result.get('message', 'Unknown error')}"
-                else:
-                    response = "❌ **Unexpected error:** No valid response received."
-                    
-            except Exception as e:
-                logger.error(f"Error in get_logo_url: {e}")
-                response = f"❌ **Error:** {str(e)}"
+            if domain:
+                result = await brandfetch_logo_lookup_checked.get_logo_for_domain(domain)
+            elif name_param:
+                # Use name directly as domain parameter, with company_hint for better search
+                result = await brandfetch_logo_lookup_checked.get_logo_for_domain(name_param, company_hint=name_param)
+            else:
+                raise ValueError("Either 'domain' or 'name' must be provided")
             
-            return [TextContent(type="text", text=response)]
-
+            # Format the result
+            if "error" in result:
+                formatted = f"❌ **No logo found**"
+            else:
+                formatted = f"**Logo URL:** {result.get('logo_url', 'N/A')}\n"
+                formatted += f"**Source:** {result.get('source', 'unknown')}\n"
+                formatted += f"**Reason:** {result.get('reason', 'N/A')}\n"
+                if result.get('warning'):
+                    formatted += f"**Warning:** {result.get('warning')}\n"
+                if 'brand_api_calls_this_month' in result:
+                    formatted += f"**Brand API calls this month:** {result.get('brand_api_calls_this_month')}\n"
+            
+            return [TextContent(type="text", text=formatted)]
+        
         else:
-            raise ValueError(f"Unknown tool: {name}")
-
-    except ValueError as e:
-        # Handle our custom error messages
-        error_msg = str(e)
-        logger.error(f"ValueError in {name}: {error_msg}")
-        return [TextContent(type="text", text=f"❌ Error: {error_msg}")]
-
+            return [TextContent(type="text", text=f"❌ Error: Unknown tool: {name}")]
+    
     except httpx.HTTPStatusError as e:
-        # Handle HTTP errors with context
-        status = e.response.status_code
-        error_msg = f"API error ({status}): {e.response.text}"
-        logger.error(f"HTTPStatusError in {name}: {error_msg}")
-        return [TextContent(type="text", text=f"❌ API Error: {error_msg}")]
-
+        status_code = e.response.status_code
+        error_text = e.response.text
+        logger.error(f"HTTP error executing tool {name}: {e}")
+        return [TextContent(type="text", text=f"❌ API Error: API error ({status_code}): {error_text}")]
+    
+    except KeyError as e:
+        logger.error(f"Missing parameter error executing tool {name}: {e}")
+        return [TextContent(type="text", text=f"❌ Error: Missing required parameter: {str(e)}")]
+    
+    except ValueError as e:
+        logger.error(f"Value error executing tool {name}: {e}")
+        return [TextContent(type="text", text=f"❌ Error: {str(e)}")]
+    
     except Exception as e:
-        # Handle unexpected errors
-        error_msg = f"Unexpected error executing {name}: {str(e)}"
-        logger.error(error_msg)
-        return [TextContent(type="text", text=f"❌ Error: {error_msg}")]
+        logger.error(f"Error executing tool {name}: {e}")
+        return [TextContent(type="text", text=f"❌ Error: Unexpected error executing {name}: {str(e)}")]
 
 
-async def main():
+def main():
     """Main entry point for the MCP server."""
-    from mcp.server.stdio import stdio_server
-
-    logger.info("Starting Brandfetch MCP server...")
-
-    async with stdio_server() as (read_stream, write_stream):
-        await app.run(
-            read_stream,
-            write_stream,
-            app.create_initialization_options(),
-        )
-
-
-def run():
-    """Synchronous entry point for command-line execution."""
-    asyncio.run(main())
+    import asyncio
+    
+    async def run_server():
+        """Run the MCP server."""
+        from mcp.server.stdio import stdio_server
+        from mcp.types import InitializationOptions
+        
+        async with stdio_server() as (read_stream, write_stream):
+            await app.run(read_stream, write_stream, InitializationOptions())
+    
+    asyncio.run(run_server())
 
 
 if __name__ == "__main__":
-    run()
+    main()

@@ -28,6 +28,18 @@ This server prioritizes the **Logo-by-Domain API** (high quota, unlimited usage)
 - Brandfetch API keys (both Logo and Brand API)
 - [uv](https://astral.sh/uv) (recommended package manager)
 
+## API Key Setup
+
+You need two API keys from Brandfetch:
+1. **Logo API Key** (high quota, for domain lookups)
+2. **Brand API Key** (limited quota, for fallback searches)
+
+Add both to your `.env` file:
+```env
+BRANDFETCH_LOGO_KEY="your_logo_api_key_here"
+BRANDFETCH_BRAND_KEY="your_brand_api_key_here"
+```
+
 ## Quickstart (one page)
 
 1. **Get the right API keys**  
@@ -69,6 +81,12 @@ This server prioritizes the **Logo-by-Domain API** (high quota, unlimited usage)
    }
    ```
    Restart Claude Desktop; look for the hammer icon.
+
+## Project Structure
+Key files:
+- `src/brandfetch_mcp/server.py`: Main MCP server implementation
+- `src/brandfetch_mcp/client.py`: Brandfetch API client
+- `src/brandfetch_mcp/brandfetch_logo_lookup_checked.py`: Logo lookup functionality
 
 ## Usage
 
