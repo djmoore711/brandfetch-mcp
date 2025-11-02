@@ -25,7 +25,7 @@ install:
 	@echo "✅ Installation complete!"
 	@echo "Don't forget to:"
 	@echo "  1. Copy .env.example to .env"
-	@echo "  2. Add your BRANDFETCH_API_KEY to .env"
+	@echo "  2. Add your BRANDFETCH_LOGO_KEY and BRANDFETCH_BRAND_KEY to .env"
 	@echo "  3. Activate environment: source .venv/bin/activate"
 
 # Run tests
@@ -86,8 +86,8 @@ manual-test:
 verify:
 	@echo "Verifying installation..."
 	@python -c "import mcp; import httpx; import dotenv; print('✅ All imports successful')"
-	@echo "Checking API key..."
-	@python -c "from dotenv import load_dotenv; import os; load_dotenv(); key = os.getenv('BRANDFETCH_API_KEY'); print('✅ API key found' if key else '❌ API key not found')"
+	@echo "Checking API keys..."
+	@python -c "from dotenv import load_dotenv; import os; load_dotenv(); lk=os.getenv('BRANDFETCH_LOGO_KEY'); bk=os.getenv('BRANDFETCH_BRAND_KEY'); print(f'Logo key: {"✅ found" if lk else "❌ missing"}, Brand key: {"✅ found" if bk else "❌ missing"}')"
 	@echo ""
 	@echo "Ready to use!"
 

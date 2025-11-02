@@ -28,7 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Relative path loading for `.env` file with `override=False` for testability
 
 ### Deprecated
-- `BRANDFETCH_API_KEY` environment variable (will be removed in v1.0.0)
+- `BRANDFETCH_API_KEY` environment variable (removed in v0.2.1)
 - `api_key` parameter in `BrandfetchClient.__init__()` (will be removed in v1.0.0)
 
 ### Fixed
@@ -41,8 +41,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Migration Guide
 ```bash
-# Old way (deprecated)
-export BRANDFETCH_API_KEY="your_key_here"
+# Old way (removed)
+# export BRANDFETCH_API_KEY="your_key_here"
 
 # New way (recommended)
 export BRANDFETCH_LOGO_KEY="your_logo_key_here"

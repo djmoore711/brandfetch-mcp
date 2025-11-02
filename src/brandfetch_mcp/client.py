@@ -9,10 +9,11 @@ load_dotenv()
 class BrandfetchClient:
     def __init__(self):
         self.base_url = "https://api.brandfetch.io/v2"
-        self.api_key = os.getenv("BRANDFETCH_API_KEY")
+        # Use Brand API key for /brands and /search endpoints
+        self.api_key = os.getenv("BRANDFETCH_BRAND_KEY")
         
         if not self.api_key:
-            raise ValueError("BRANDFETCH_API_KEY must be set in .env")
+            raise ValueError("BRANDFETCH_BRAND_KEY must be set in .env")
         
         self.headers = {
             "Authorization": f"Bearer {self.api_key}",

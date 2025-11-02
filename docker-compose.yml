@@ -4,7 +4,8 @@ services:
   brandfetch-mcp:
     build: .
     environment:
-      - BRANDFETCH_API_KEY=${BRANDFETCH_API_KEY}
+      - BRANDFETCH_LOGO_KEY=${BRANDFETCH_LOGO_KEY}
+      - BRANDFETCH_BRAND_KEY=${BRANDFETCH_BRAND_KEY}
     volumes:
       - ./src:/app/src
     restart: unless-stopped

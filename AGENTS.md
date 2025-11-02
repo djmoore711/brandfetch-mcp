@@ -63,11 +63,11 @@ python -c "import mcp; import httpx; import dotenv; print('All imports successfu
 # Copy environment template
 cp .env.example .env
 
-# User must add their API key manually
-# Edit .env and set: BRANDFETCH_API_KEY=actual_key_here
+# User must add their API keys manually
+# Edit .env and set: BRANDFETCH_LOGO_KEY=your_logo_key_here and BRANDFETCH_BRAND_KEY=your_brand_key_here
 ```
 
-**Important:** The user must provide their own Brandfetch API key from https://brandfetch.com/developers
+**Important:** The user must provide their own Brandfetch API keys from https://brandfetch.com/developers
 
 ## Testing Strategy
 
@@ -133,17 +133,22 @@ async def test_invalid_domain():
 @pytest.mark.asyncio  
 async def test_missing_api_key():
     import os
-    old_key = os.environ.get("BRANDFETCH_API_KEY")
+    old_logo_key = os.environ.get("BRANDFETCH_LOGO_KEY")
+    old_brand_key = os.environ.get("BRANDFETCH_BRAND_KEY")
     
     try:
-        if old_key:
-            del os.environ["BRANDFETCH_API_KEY"]
+        if old_logo_key:
+            del os.environ["BRANDFETCH_LOGO_KEY"]
+        if old_brand_key:
+            del os.environ["BRANDFETCH_BRAND_KEY"]
         
-        with pytest.raises(ValueError, match="BRANDFETCH_API_KEY"):
+        with pytest.raises(ValueError, match="BRANDFETCH_BRAND_KEY"):
             BrandfetchClient()
     finally:
-        if old_key:
-            os.environ["BRANDFETCH_API_KEY"] = old_key
+        if old_logo_key:
+            os.environ["BRANDFETCH_LOGO_KEY"] = old_logo_key
+        if old_brand_key:
+            os.environ["BRANDFETCH_BRAND_KEY"] = old_brand_key
 ```
 
 Run tests:
@@ -242,7 +247,8 @@ Configure Claude Desktop (~/Library/Application Support/Claude/claude_desktop_co
         "mcp-brandfetch"
       ],
       "env": {
-        "BRANDFETCH_API_KEY": "actual_key_here"
+        "BRANDFETCH_LOGO_KEY": "your_logo_key_here",
+        "BRANDFETCH_BRAND_KEY": "your_brand_key_here"
       }
     }
   }
@@ -291,7 +297,7 @@ async def get_brand(self, domain: str) -> Dict[str, Any]:
         if e.response.status_code == 404:
             raise ValueError(f"Brand not found for domain: {domain}")
         elif e.response.status_code == 401:
-            raise ValueError("Invalid API key. Check BRANDFETCH_API_KEY.")
+            raise ValueError("Invalid API key. Check BRANDFETCH_BRAND_KEY.")
         elif e.response.status_code == 429:
             raise ValueError("Rate limit exceeded. Try again later.")
         else:
@@ -470,7 +476,7 @@ python -c "import mcp; print(mcp.__file__)"
 ```
 
 ### Issue 2: API Key Not Found
-**Symptom:** `ValueError: BRANDFETCH_API_KEY must be set`
+**Symptom:** `ValueError: BRANDFETCH_BRAND_KEY must be set`
 
 **Solution:**
 ```bash
@@ -478,7 +484,7 @@ python -c "import mcp; print(mcp.__file__)"
 cat .env
 
 # Verify key is loaded
-python -c "from dotenv import load_dotenv; import os; load_dotenv(); print(os.getenv('BRANDFETCH_API_KEY'))"
+python -c "from dotenv import load_dotenv; import os; load_dotenv(); print(os.getenv('BRANDFETCH_BRAND_KEY'))"
 
 # Ensure .env is in project root
 ls -la /Users/dj/Code/brandfetch_mcp/.env
@@ -529,7 +535,7 @@ Before considering the implementation complete:
 
 ### Error Handling
 - [ ] Invalid domain returns clear error
-- [ ] Missing API key shows helpful message
+- [ ] Missing API keys show helpful message
 - [ ] Rate limiting is communicated clearly
 - [ ] Network errors are caught
 - [ ] Malformed responses handled
