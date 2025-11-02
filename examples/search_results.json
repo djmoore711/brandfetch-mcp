@@ -1,0 +1,32 @@
+[
+  {
+    "name": "Starbucks",
+    "domain": "starbucks.com",
+    "claimed": true,
+    "icon": "https://asset.brandfetch.io/id20mQyGeY/idV3zwmSiY.jpeg"
+  },
+  {
+    "name": "Dunkin'",
+    "domain": "dunkindonuts.com",
+    "claimed": true,
+    "icon": "https://asset.brandfetch.io/idqVGvo5e4/idMKqvoKHW.jpeg"
+  },
+  {
+    "name": "Blue Bottle Coffee",
+    "domain": "bluebottlecoffee.com",
+    "claimed": false,
+    "icon": "https://asset.brandfetch.io/idFGsG6M8e/idYphR5V9W.png"
+  },
+  {
+    "name": "Peet's Coffee",
+    "domain": "peets.com",
+    "claimed": false,
+    "icon": "https://asset.brandfetch.io/idw7MgN5Zu/id8vDqFGT_.png"
+  },
+  {
+    "name": "Tim Hortons",
+    "domain": "timhortons.com",
+    "claimed": true,
+    "icon": "https://asset.brandfetch.io/id1VnPNXeq/idMZzW5Hza.png"
+  }
+]

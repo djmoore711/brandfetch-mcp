@@ -1,0 +1,22 @@
+[
+  {
+    "hex": "#e50914",
+    "type": "accent",
+    "brightness": 45
+  },
+  {
+    "hex": "#000000",
+    "type": "dark",
+    "brightness": 0
+  },
+  {
+    "hex": "#ffffff",
+    "type": "light",
+    "brightness": 100
+  },
+  {
+    "hex": "#831010",
+    "type": "accent",
+    "brightness": 30
+  }
+]

@@ -1,0 +1,2 @@
+# Disable specific shellcheck warnings
+disable=SC2148,SC2034

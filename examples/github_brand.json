@@ -1,0 +1,114 @@
+{
+  "name": "GitHub",
+  "domain": "github.com",
+  "claimed": true,
+  "description": "GitHub is where over 100 million developers shape the future of software, together.",
+  "longDescription": "GitHub is a development platform inspired by the way you work. From open source to business, you can host and review code, manage projects, and build software alongside millions of other developers.",
+  "links": [
+    {
+      "name": "twitter",
+      "url": "https://twitter.com/github"
+    },
+    {
+      "name": "facebook",
+      "url": "https://www.facebook.com/GitHub"
+    },
+    {
+      "name": "linkedin",
+      "url": "https://www.linkedin.com/company/github"
+    },
+    {
+      "name": "instagram",
+      "url": "https://www.instagram.com/github/"
+    }
+  ],
+  "logos": [
+    {
+      "type": "logo",
+      "theme": "light",
+      "formats": [
+        {
+          "src": "https://asset.brandfetch.io/idZClyFozp/idanq5E7p-.svg",
+          "background": "transparent",
+          "format": "svg",
+          "size": 2845
+        },
+        {
+          "src": "https://asset.brandfetch.io/idZClyFozp/idQ25gID54.png",
+          "background": "transparent",
+          "format": "png",
+          "height": 162,
+          "width": 800,
+          "size": 8234
+        }
+      ]
+    },
+    {
+      "type": "logo",
+      "theme": "dark",
+      "formats": [
+        {
+          "src": "https://asset.brandfetch.io/idZClyFozp/id0EO1w7cy.svg",
+          "background": "transparent",
+          "format": "svg",
+          "size": 2845
+        }
+      ]
+    },
+    {
+      "type": "icon",
+      "theme": "light",
+      "formats": [
+        {
+          "src": "https://asset.brandfetch.io/idZClyFozp/idv3zwmSiY.jpeg",
+          "background": "transparent",
+          "format": "jpeg",
+          "height": 800,
+          "width": 800,
+          "size": 15234
+        }
+      ]
+    }
+  ],
+  "colors": [
+    {
+      "hex": "#181717",
+      "type": "dark",
+      "brightness": 9
+    },
+    {
+      "hex": "#ffffff",
+      "type": "light",
+      "brightness": 100
+    },
+    {
+      "hex": "#f5f5f5",
+      "type": "light",
+      "brightness": 96
+    }
+  ],
+  "fonts": [
+    {
+      "name": "Mona Sans",
+      "type": "title",
+      "origin": "custom"
+    },
+    {
+      "name": "Hubot Sans",
+      "type": "body",
+      "origin": "custom"
+    }
+  ],
+  "images": [
+    {
+      "type": "banner",
+      "formats": [
+        {
+          "src": "https://asset.brandfetch.io/idZClyFozp/id8z_L0C0-.png",
+          "format": "png",
+          "size": 125000
+        }
+      ]
+    }
+  ]
+}
