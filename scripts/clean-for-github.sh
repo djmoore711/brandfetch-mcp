@@ -163,31 +163,67 @@ main() {
     print_status "Removing sensitive and development files from git tracking"
     
     files_removed=0
+    files_cleaned=0
+    
+    # Function to remove both tracked and untracked files
+    remove_file_completely() {
+        local file="$1"
+        local desc="$2"
+        
+        # Try to remove from git if tracked
+        if git ls-files --error-unmatch "$file" >/dev/null 2>&1; then
+            echo "Removing $desc from git tracking: $file"
+            if [[ -z "${DRY_RUN:-}" ]]; then
+                if git rm --cached "$file" 2>/dev/null; then
+                    ((files_removed++))
+                fi
+            else
+                print_dry_run "Would remove from git: $file"
+                ((files_removed++))
+            fi
+        fi
+        
+        # Remove from filesystem if it exists
+        if [[ -e "$file" ]]; then
+            echo "Removing $desc from filesystem: $file"
+            if [[ -z "${DRY_RUN:-}" ]]; then
+                rm -f "$file"
+                ((files_cleaned++))
+            else
+                print_dry_run "Would delete: $file"
+                ((files_cleaned++))
+            fi
+        fi
+    }
+    
     # Remove sensitive files
-    if safe_git_rm ".env" "API key file"; then ((files_removed++)); fi
-    if safe_git_rm ".coverage" "coverage file"; then ((files_removed++)); fi
-    if safe_git_rm "brand_api_usage.db" "database file"; then ((files_removed++)); fi
-    if safe_git_rm ".python-version" "Python version file"; then ((files_removed++)); fi
-    if safe_git_rm "uv.lock" "uv lock file"; then ((files_removed++)); fi
+    remove_file_completely ".env" "API key file"
+    remove_file_completely ".coverage" "coverage file"
+    remove_file_completely "brand_api_usage.db" "database file"
+    remove_file_completely ".python-version" "Python version file"
+    remove_file_completely "uv.lock" "uv lock file"
+    remove_file_completely ".shellcheckrc" "shellcheck config"
+    remove_file_completely ".snyk" "snyk config"
     
     # Remove development directories
-    if git ls-files --error-unmatch ".pytest_cache" >/dev/null 2>&1; then
-        echo "Removing pytest cache from git tracking"
+    if [[ -d ".pytest_cache" ]] || git ls-files --error-unmatch ".pytest_cache" >/dev/null 2>&1; then
+        echo "Removing pytest cache"
         if [[ -z "${DRY_RUN:-}" ]]; then
-            if git rm -r --cached .pytest_cache 2>/dev/null; then
+            if git ls-files --error-unmatch ".pytest_cache" >/dev/null 2>&1; then
+                git rm -r --cached .pytest_cache 2>/dev/null || true
                 ((files_removed++))
+            fi
+            if [[ -d ".pytest_cache" ]]; then
+                rm -rf .pytest_cache
+                ((files_cleaned++))
             fi
         else
             print_dry_run "Would remove directory: .pytest_cache"
             ((files_removed++))
         fi
     else
-        echo "pytest cache not tracked: .pytest_cache"
+        echo "pytest cache not found: .pytest_cache"
     fi
-    
-    # Remove other development files
-    if safe_git_rm ".shellcheckrc" "shellcheck config"; then ((files_removed++)); fi
-    if safe_git_rm ".snyk" "snyk config"; then ((files_removed++)); fi
     
     # Clean up empty/placeholder files
     print_status "Cleaning up empty/placeholder files"
@@ -277,6 +313,7 @@ main() {
         echo ""
         echo "Summary of what would be done:"
         echo "   - Files to remove from git tracking: $files_removed"
+        echo "   - Files to delete from filesystem: $files_cleaned"
         echo "   - Patterns to add to .gitignore: $patterns_added"
     else
         echo ""
@@ -299,6 +336,7 @@ main() {
             echo ""
             echo "Summary of changes:"
             echo "   - Files removed from git tracking: $files_removed"
+            echo "   - Files deleted from filesystem: $files_cleaned"
             echo "   - Patterns added to .gitignore: $patterns_added"
         else
             print_error "Failed to commit changes!"
