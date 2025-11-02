@@ -74,3 +74,5 @@ var/
 .python-version
 # Allow the example env template to be tracked
 !/.env.example
+.shellcheckrc
+.snyk
