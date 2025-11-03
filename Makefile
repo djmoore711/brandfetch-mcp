@@ -87,7 +87,7 @@ verify:
 	@echo "Verifying installation..."
 	@python -c "import mcp; import httpx; import dotenv; print('✅ All imports successful')"
 	@echo "Checking API keys..."
-	@python -c "from dotenv import load_dotenv; import os; load_dotenv(); lk=os.getenv('BRANDFETCH_CLIENT_ID'); bk=os.getenv('BRANDFETCH_API_KEY'); print(f'Logo key: {"✅ found" if lk else "❌ missing"}, Brand key: {"✅ found" if bk else "❌ missing"})"
+	@python -c "from dotenv import load_dotenv; import os; load_dotenv(); lk=os.getenv('BRANDFETCH_CLIENT_ID'); bk=os.getenv('BRANDFETCH_API_KEY'); print('Logo key: ' + ('✅ found' if lk and lk != 'your_logo_api_key_here' else '❌ missing') + ', Brand key: ' + ('✅ found' if bk and bk != 'your_brand_api_key_here' else '❌ missing'))"
 	@echo ""
 	@echo "Ready to use!"
 
