@@ -6,6 +6,7 @@ services:
     environment:
       - BRANDFETCH_LOGO_KEY=${BRANDFETCH_LOGO_KEY}
       - BRANDFETCH_BRAND_KEY=${BRANDFETCH_BRAND_KEY}
+      - BRANDFETCH_CLIENT_ID=${BRANDFETCH_CLIENT_ID}
     volumes:
       - ./src:/app/src
     restart: unless-stopped

@@ -1,6 +1,7 @@
 import os
 import httpx
 from typing import Dict, Any, List, Optional
+from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
@@ -10,20 +11,57 @@ class BrandfetchClient:
     def __init__(self):
         self.base_url = "https://api.brandfetch.io/v2"
         # Use Brand API key for /brands and /search endpoints
-        self.api_key = os.getenv("BRANDFETCH_BRAND_KEY")
+        self.api_key = os.getenv("BRANDFETCH_API_KEY")
+        self.client_id = os.getenv("BRANDFETCH_CLIENT_ID")
         
         if not self.api_key:
-            raise ValueError("BRANDFETCH_BRAND_KEY must be set in .env")
+            raise ValueError("BRANDFETCH_API_KEY must be set in .env")
         
         self.headers = {
             "Authorization": f"Bearer {self.api_key}",
             "Content-Type": "application/json"
         }
 
+    def _append_client_id(self, url: str) -> str:
+        """
+        Append client ID to CDN URLs for Brandfetch hotlinking compliance.
+        Only applies to cdn.brandfetch.io URLs.
+        """
+        if not self.client_id:
+            return url
+        
+        parsed = urlparse(url)
+        if "cdn.brandfetch.io" not in parsed.netloc:
+            return url
+        
+        # Parse existing query parameters
+        query_params = parse_qs(parsed.query)
+        query_params['c'] = [self.client_id]
+        
+        # Rebuild URL with client ID
+        new_parsed = parsed._replace(query=urlencode(query_params, doseq=True))
+        return urlunparse(new_parsed)
+
+    def _clean_domain(self, domain: str) -> str:
+        """Clean and normalize domain input."""
+        # Strip whitespace from input first
+        domain = domain.strip()
+        
+        # Parse URL to extract domain properly
+        parsed = urlparse(domain)
+        clean_domain = parsed.netloc or parsed.path  # netloc for URLs, path for plain domains
+        
+        # Remove www prefix (case-insensitive) and convert to lowercase
+        if clean_domain.lower().startswith("www."):
+            clean_domain = clean_domain[4:]  # Remove "www."
+        clean_domain = clean_domain.lower()
+        
+        return clean_domain.strip("/")  # Only strip slashes now
+
     async def get_brand(self, domain: str) -> Dict[str, Any]:
         """Retrieve comprehensive brand data for a domain."""
         # Clean domain input
-        domain = domain.replace("https://", "").replace("http://", "").replace("www.", "").strip("/")
+        domain = self._clean_domain(domain)
         
         async with httpx.AsyncClient() as client:
             response = await client.get(
@@ -49,7 +87,7 @@ class BrandfetchClient:
     async def get_brand_logo(self, domain: str, format: str = "svg", theme: str = "light", type: str = "logo") -> Dict[str, Any]:
         """Retrieve brand logo in specified format."""
         # Clean domain input
-        domain = domain.replace("https://", "").replace("http://", "").replace("www.", "").strip("/")
+        domain = self._clean_domain(domain)
         
         # Get brand data first
         brand_data = await self.get_brand(domain)
@@ -92,7 +130,7 @@ class BrandfetchClient:
             
             if target_format:
                 return {
-                    "url": target_format.get("src"),
+                    "url": self._append_client_id(target_format.get("src")),
                     "format": target_format.get("format"),
                     "theme": best_logo.get("theme"),
                     "type": best_logo.get("type"),
@@ -109,7 +147,7 @@ class BrandfetchClient:
     async def get_brand_colors(self, domain: str) -> List[Dict[str, Any]]:
         """Extract brand color palette."""
         # Clean domain input
-        domain = domain.replace("https://", "").replace("http://", "").replace("www.", "").strip("/")
+        domain = self._clean_domain(domain)
         
         # Get brand data first
         brand_data = await self.get_brand(domain)

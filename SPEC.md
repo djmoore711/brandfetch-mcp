@@ -12,5 +12,6 @@ Create an MCP server that exposes Brandfetch API capabilities as MCP tools.
 ## Environment Variables
 - BRANDFETCH_LOGO_KEY: API key for logo-by-domain endpoints (high quota)
 - BRANDFETCH_BRAND_KEY: API key for brand details and search endpoints (limited quota)
+- BRANDFETCH_CLIENT_ID: Client ID for hotlinking compliance (optional but recommended)
 
 See full documentation in API_REFERENCE.md

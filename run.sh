@@ -11,7 +11,7 @@ if [ ! -d ".venv" ]; then
 fi
 if [ ! -f ".env" ]; then
     echo "Error: .env file not found."
-    echo "Copy .env.example to .env and add your BRANDFETCH_LOGO_KEY and BRANDFETCH_BRAND_KEY"
+    echo "Copy .env.example to .env and add your BRANDFETCH_LOGO_KEY, BRANDFETCH_BRAND_KEY, and BRANDFETCH_CLIENT_ID"
     exit 1
 fi
 

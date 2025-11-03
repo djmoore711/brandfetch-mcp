@@ -10,8 +10,8 @@ Robust, concurrency-safe implementation to:
 Configuration (env vars):
 - BRANDFETCH_LOGO_API_URL: e.g. "https://api.brandfetch.io/logo?domain={domain}"
 - BRANDFETCH_BRAND_API_URL: e.g. "https://api.brandfetch.io/brand/search?q={q}"
-- BRANDFETCH_LOGO_KEY: Bearer token for logo-by-domain (high quota)
-- BRANDFETCH_BRAND_KEY: Bearer token for Brand API (limited)
+- BRANDFETCH_CLIENT_ID: Bearer token for logo-by-domain (high quota)
+- BRANDFETCH_API_KEY: Bearer token for Brand API (limited)
 - BRANDFETCH_DB_PATH: path to sqlite DB file (default: brand_api_usage.db)
 - BRAND_API_MONTH_LIMIT: integer (default 100)
 - BRAND_API_WARN_THRESHOLD: integer (default 90)
@@ -23,6 +23,7 @@ import json
 import sqlite3
 from datetime import datetime
 from typing import Any, Dict, List, Optional
+from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
 import logging
 
 # Use httpx instead of requests for async compatibility
@@ -34,14 +35,41 @@ logger = logging.getLogger("brandfetch-logo-lookup")
 # Config with sensible defaults
 LOGO_API_URL = os.getenv("BRANDFETCH_LOGO_API_URL", "https://api.brandfetch.io/v2/logo/{domain}")
 BRAND_API_URL = os.getenv("BRANDFETCH_BRAND_API_URL", "https://api.brandfetch.io/v2/search/{q}")
-LOGO_API_KEY = os.getenv("BRANDFETCH_LOGO_KEY")
-BRAND_API_KEY = os.getenv("BRANDFETCH_BRAND_KEY")
+LOGO_API_KEY = os.getenv("BRANDFETCH_CLIENT_ID")
+BRAND_API_KEY = os.getenv("BRANDFETCH_API_KEY")
+CLIENT_ID = os.getenv("BRANDFETCH_CLIENT_ID")
 DB_PATH = os.getenv("BRANDFETCH_DB_PATH", "brand_api_usage.db")
 BRAND_API_MONTH_LIMIT = int(os.getenv("BRAND_API_MONTH_LIMIT", "100"))
 BRAND_API_WARN_THRESHOLD = int(os.getenv("BRAND_API_WARN_THRESHOLD", "90"))
 REQUEST_TIMEOUT = int(os.getenv("BRANDFETCH_REQUEST_TIMEOUT_SEC", "8"))
 
 IMAGE_EXTENSIONS = (".png", ".svg", ".jpg", ".jpeg", ".webp", ".gif", ".ico")
+
+
+# ----------------------
+# Client ID helper for hotlinking compliance
+# ----------------------
+def _append_client_id(url: str) -> str:
+    """
+    Append client ID to CDN URLs for Brandfetch hotlinking compliance.
+    Only applies to cdn.brandfetch.io URLs.
+    """
+    if not CLIENT_ID:
+        if "cdn.brandfetch.io" in url:
+            logger.warning("Logo URL returned without client ID - may violate Brandfetch ToS. Set BRANDFETCH_CLIENT_ID for compliance")
+        return url
+    
+    parsed = urlparse(url)
+    if "cdn.brandfetch.io" not in parsed.netloc:
+        return url
+    
+    # Parse existing query parameters
+    query_params = parse_qs(parsed.query)
+    query_params['c'] = [CLIENT_ID]
+    
+    # Rebuild URL with client ID
+    new_parsed = parsed._replace(query=urlencode(query_params, doseq=True))
+    return urlunparse(new_parsed)
 
 
 # ----------------------
@@ -202,7 +230,8 @@ async def call_logo_api(domain: str) -> Dict[str, Any]:
     all_candidates = []
     for c in parsed_candidates + text_candidates:
         if c not in all_candidates:
-            all_candidates.append(c)
+            # Apply client ID for hotlinking compliance
+            all_candidates.append(_append_client_id(c))
 
     return {
         "status_code": resp.status_code,
@@ -248,7 +277,8 @@ async def call_brand_api_search(query: str) -> Dict[str, Any]:
     all_candidates = []
     for c in parsed_candidates + text_candidates:
         if c not in all_candidates:
-            all_candidates.append(c)
+            # Apply client ID for hotlinking compliance
+            all_candidates.append(_append_client_id(c))
 
     return {
         "status_code": resp.status_code,

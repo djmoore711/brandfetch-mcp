@@ -26,7 +26,7 @@ This server prioritizes the **Logo-by-Domain API** (high quota, unlimited usage)
 
 - Python 3.10+
 - Brandfetch API keys (both Logo and Brand API)
-- [uv](https://astral.sh/uv) (recommended package manager)
+- [uv](https://astral.sh/uv)
 
 ## API Key Setup
 
@@ -35,9 +35,19 @@ You need two API keys from Brandfetch:
 2. **Brand API Key** (limited quota, for fallback searches)
 
 Add both to your `.env` file:
-```env
+```bash
+# Brandfetch API Configuration
+# Get both keys from https://brandfetch.com/developers
+
+# Logo API Key (high quota, for domain lookups)
 BRANDFETCH_LOGO_KEY="your_logo_api_key_here"
+
+# Brand API Key (limited quota, for fallback searches)
 BRANDFETCH_BRAND_KEY="your_brand_api_key_here"
+
+# Client ID for hotlinking compliance (optional but recommended)
+# Get from https://developers.brandfetch.com/register
+BRANDFETCH_CLIENT_ID="your_client_id_here"
 ```
 
 ## Quickstart (one page)
