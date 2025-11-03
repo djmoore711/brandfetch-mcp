@@ -21,6 +21,5 @@
 ## Add to .env
 
 ```bash
-BRANDFETCH_LOGO_KEY="paste_logo_key_here"
-BRANDFETCH_BRAND_KEY="paste_brand_key_here"
-BRANDFETCH_CLIENT_ID="paste_client_id_here"
+BRANDFETCH_CLIENT_ID="paste_logo_key_here"
+BRANDFETCH_API_KEY="paste_brand_key_here"

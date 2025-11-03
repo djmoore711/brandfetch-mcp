@@ -10,7 +10,7 @@ Robust, concurrency-safe implementation to:
 Configuration (env vars):
 - BRANDFETCH_LOGO_API_URL: e.g. "https://api.brandfetch.io/logo?domain={domain}"
 - BRANDFETCH_BRAND_API_URL: e.g. "https://api.brandfetch.io/brand/search?q={q}"
-- BRANDFETCH_CLIENT_ID: Bearer token for logo-by-domain (high quota)
+- BRANDFETCH_CLIENT_ID: Bearer token for logo-by-domain (high quota) and client ID for CDN URL query parameters (hotlinking compliance)
 - BRANDFETCH_API_KEY: Bearer token for Brand API (limited)
 - BRANDFETCH_DB_PATH: path to sqlite DB file (default: brand_api_usage.db)
 - BRAND_API_MONTH_LIMIT: integer (default 100)
@@ -198,7 +198,7 @@ async def call_logo_api(domain: str) -> Dict[str, Any]:
     - candidates (list of image URLs found)
     """
     if not LOGO_API_KEY:
-        raise RuntimeError("Missing BRANDFETCH_LOGO_KEY environment variable")
+        raise RuntimeError("Missing BRANDFETCH_CLIENT_ID environment variable")
 
     url = LOGO_API_URL.format(domain=domain)
     headers = {"Authorization": f"Bearer {LOGO_API_KEY}"}
@@ -246,7 +246,7 @@ async def call_brand_api_search(query: str) -> Dict[str, Any]:
     Call the Brand API search endpoint. Returns a dict similar to call_logo_api.
     """
     if not BRAND_API_KEY:
-        raise RuntimeError("Missing BRANDFETCH_BRAND_KEY environment variable")
+        raise RuntimeError("Missing BRANDFETCH_API_KEY environment variable")
 
     url = BRAND_API_URL.format(q=query)
     headers = {"Authorization": f"Bearer {BRAND_API_KEY}"}

@@ -144,7 +144,7 @@ Try searching first with search_brands to find the correct domain.
 
 ```
 ❌ Error: Authentication failed. Your API key may be invalid or expired. 
-Verify BRANDFETCH_LOGO_KEY and BRANDFETCH_BRAND_KEY in your .env file. 
+Verify BRANDFETCH_CLIENT_ID and BRANDFETCH_API_KEY in your .env file. 
 Get new keys at https://brandfetch.com/developers
 ```
 

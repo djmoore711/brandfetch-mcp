@@ -40,14 +40,10 @@ Add both to your `.env` file:
 # Get both keys from https://brandfetch.com/developers
 
 # Logo API Key (high quota, for domain lookups)
-BRANDFETCH_LOGO_KEY="your_logo_api_key_here"
+BRANDFETCH_CLIENT_ID="your_logo_api_key_here"
 
 # Brand API Key (limited quota, for fallback searches)
-BRANDFETCH_BRAND_KEY="your_brand_api_key_here"
-
-# Client ID for hotlinking compliance (optional but recommended)
-# Get from https://developers.brandfetch.com/register
-BRANDFETCH_CLIENT_ID="your_client_id_here"
+BRANDFETCH_API_KEY="your_brand_api_key_here"
 ```
 
 ## Quickstart (one page)
@@ -62,7 +58,7 @@ BRANDFETCH_CLIENT_ID="your_client_id_here"
    ```bash
    uv venv && source .venv/bin/activate
    uv pip install -e ".[dev]"
-   cp .env.example .env  # then add both BRANDFETCH_LOGO_KEY and BRANDFETCH_BRAND_KEY
+   cp .env.example .env  # then add both BRANDFETCH_CLIENT_ID and BRANDFETCH_API_KEY
    python manual_test.py
    ```
 
@@ -70,8 +66,8 @@ BRANDFETCH_CLIENT_ID="your_client_id_here"
    ```bash
    docker build -t brandfetch-mcp .
    docker run --rm \
-     -e BRANDFETCH_LOGO_KEY=your_logo_key \
-     -e BRANDFETCH_BRAND_KEY=your_brand_key \
+     -e BRANDFETCH_CLIENT_ID=your_logo_key \
+     -e BRANDFETCH_API_KEY=your_brand_key \
      brandfetch-mcp
    ```
 
@@ -83,8 +79,8 @@ BRANDFETCH_CLIENT_ID="your_client_id_here"
          "command": "uv",
          "args": ["--directory", "/absolute/path/to/brandfetch_mcp", "run", "mcp-brandfetch"],
          "env": { 
-           "BRANDFETCH_LOGO_KEY": "your_logo_key",
-           "BRANDFETCH_BRAND_KEY": "your_brand_key"
+           "BRANDFETCH_CLIENT_ID": "your_logo_key",
+           "BRANDFETCH_API_KEY": "your_brand_key"
          }
        }
      }

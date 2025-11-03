@@ -11,7 +11,7 @@ class TestBrandfetchClientInit:
     
     def test_init_success(self):
         """Test successful client initialization with valid API key."""
-        with patch.dict(os.environ, {"BRANDFETCH_BRAND_KEY": "test_key"}):
+        with patch.dict(os.environ, {"BRANDFETCH_API_KEY": "test_key"}):
             client = BrandfetchClient()
             assert client.api_key == "test_key"
             assert client.base_url == "https://api.brandfetch.io/v2"
@@ -21,7 +21,7 @@ class TestBrandfetchClientInit:
     def test_init_with_client_id(self):
         """Test initialization with client ID."""
         with patch.dict(os.environ, {
-            "BRANDFETCH_BRAND_KEY": "test_key",
+            "BRANDFETCH_API_KEY": "test_key",
             "BRANDFETCH_CLIENT_ID": "test_client_id"
         }):
             client = BrandfetchClient()
@@ -30,13 +30,13 @@ class TestBrandfetchClientInit:
     def test_init_missing_api_key(self):
         """Test initialization fails without API key."""
         with patch.dict(os.environ, {}, clear=True):
-            with pytest.raises(ValueError, match="BRANDFETCH_BRAND_KEY must be set"):
+            with pytest.raises(ValueError, match="BRANDFETCH_API_KEY must be set"):
                 BrandfetchClient()
     
     def test_init_empty_api_key(self):
         """Test initialization fails with empty API key."""
-        with patch.dict(os.environ, {"BRANDFETCH_BRAND_KEY": ""}):
-            with pytest.raises(ValueError, match="BRANDFETCH_BRAND_KEY must be set"):
+        with patch.dict(os.environ, {"BRANDFETCH_API_KEY": ""}):
+            with pytest.raises(ValueError, match="BRANDFETCH_API_KEY must be set"):
                 BrandfetchClient()
 
 
@@ -45,7 +45,7 @@ class TestAppendClientId:
     
     def test_append_client_id_no_client_id(self):
         """Test URL unchanged when no client ID is set."""
-        with patch.dict(os.environ, {"BRANDFETCH_BRAND_KEY": "test_key"}):
+        with patch.dict(os.environ, {"BRANDFETCH_API_KEY": "test_key"}):
             client = BrandfetchClient()
             client.client_id = None
             
@@ -55,7 +55,7 @@ class TestAppendClientId:
     
     def test_append_client_id_non_cdn_url(self):
         """Test non-CDN URLs are unchanged."""
-        with patch.dict(os.environ, {"BRANDFETCH_BRAND_KEY": "test_key"}):
+        with patch.dict(os.environ, {"BRANDFETCH_API_KEY": "test_key"}):
             client = BrandfetchClient()
             client.client_id = "test_client"
             
@@ -65,7 +65,7 @@ class TestAppendClientId:
     
     def test_append_client_id_cdn_url_no_query(self):
         """Test appending client ID to CDN URL without existing query."""
-        with patch.dict(os.environ, {"BRANDFETCH_BRAND_KEY": "test_key"}):
+        with patch.dict(os.environ, {"BRANDFETCH_API_KEY": "test_key"}):
             client = BrandfetchClient()
             client.client_id = "test_client"
             
@@ -75,7 +75,7 @@ class TestAppendClientId:
     
     def test_append_client_id_cdn_url_with_existing_query(self):
         """Test appending client ID to CDN URL with existing query params."""
-        with patch.dict(os.environ, {"BRANDFETCH_BRAND_KEY": "test_key"}):
+        with patch.dict(os.environ, {"BRANDFETCH_API_KEY": "test_key"}):
             client = BrandfetchClient()
             client.client_id = "test_client"
             
@@ -89,7 +89,7 @@ class TestAppendClientId:
     
     def test_append_client_id_cdn_url_replaces_existing_c(self):
         """Test that existing 'c' parameter is replaced with client ID."""
-        with patch.dict(os.environ, {"BRANDFETCH_BRAND_KEY": "test_key"}):
+        with patch.dict(os.environ, {"BRANDFETCH_API_KEY": "test_key"}):
             client = BrandfetchClient()
             client.client_id = "new_client"
             
@@ -120,7 +120,7 @@ class TestGetBrand:
             return_value=httpx.Response(200, json=mock_response)
         )
         
-        with patch.dict(os.environ, {"BRANDFETCH_BRAND_KEY": "test_key"}):
+        with patch.dict(os.environ, {"BRANDFETCH_API_KEY": "test_key"}):
             client = BrandfetchClient()
             result = await client.get_brand("github.com")
             
@@ -137,7 +137,7 @@ class TestGetBrand:
             return_value=httpx.Response(200, json=mock_response)
         )
         
-        with patch.dict(os.environ, {"BRANDFETCH_BRAND_KEY": "test_key"}):
+        with patch.dict(os.environ, {"BRANDFETCH_API_KEY": "test_key"}):
             client = BrandfetchClient()
             
             # Test various domain formats
@@ -158,7 +158,7 @@ class TestGetBrand:
     @respx.mock
     async def test_get_brand_http_errors(self):
         """Test HTTP error handling."""
-        with patch.dict(os.environ, {"BRANDFETCH_BRAND_KEY": "test_key"}):
+        with patch.dict(os.environ, {"BRANDFETCH_API_KEY": "test_key"}):
             client = BrandfetchClient()
             
             # Test 404 error
@@ -188,7 +188,7 @@ class TestGetBrand:
     @respx.mock
     async def test_get_brand_timeout(self):
         """Test timeout handling."""
-        with patch.dict(os.environ, {"BRANDFETCH_BRAND_KEY": "test_key"}):
+        with patch.dict(os.environ, {"BRANDFETCH_API_KEY": "test_key"}):
             client = BrandfetchClient()
             
             # Mock timeout
@@ -215,7 +215,7 @@ class TestSearchBrands:
             return_value=httpx.Response(200, json=mock_response)
         )
         
-        with patch.dict(os.environ, {"BRANDFETCH_BRAND_KEY": "test_key"}):
+        with patch.dict(os.environ, {"BRANDFETCH_API_KEY": "test_key"}):
             client = BrandfetchClient()
             result = await client.search_brands("git", limit=5)
             
@@ -231,7 +231,7 @@ class TestSearchBrands:
             return_value=httpx.Response(200, json=mock_response)
         )
         
-        with patch.dict(os.environ, {"BRANDFETCH_BRAND_KEY": "test_key"}):
+        with patch.dict(os.environ, {"BRANDFETCH_API_KEY": "test_key"}):
             client = BrandfetchClient()
             
             # Test limit > 50 gets capped
@@ -250,7 +250,7 @@ class TestSearchBrands:
             return_value=httpx.Response(200, json=mock_response)
         )
         
-        with patch.dict(os.environ, {"BRANDFETCH_BRAND_KEY": "test_key"}):
+        with patch.dict(os.environ, {"BRANDFETCH_API_KEY": "test_key"}):
             client = BrandfetchClient()
             await client.search_brands("test")  # No limit specified
             
@@ -267,7 +267,7 @@ class TestSearchBrands:
             return_value=httpx.Response(200, json=mock_response)
         )
         
-        with patch.dict(os.environ, {"BRANDFETCH_BRAND_KEY": "test_key"}):
+        with patch.dict(os.environ, {"BRANDFETCH_API_KEY": "test_key"}):
             client = BrandfetchClient()
             await client.search_brands("coffee & tea")
             
@@ -319,7 +319,7 @@ class TestGetBrandLogo:
             return_value=httpx.Response(200, json=mock_brand_data)
         )
         
-        with patch.dict(os.environ, {"BRANDFETCH_BRAND_KEY": "test_key"}):
+        with patch.dict(os.environ, {"BRANDFETCH_API_KEY": "test_key"}):
             client = BrandfetchClient()
             result = await client.get_brand_logo("test.com", format="svg", theme="dark", type="logo")
             
@@ -335,7 +335,7 @@ class TestGetBrandLogo:
             return_value=httpx.Response(200, json=mock_brand_data)
         )
         
-        with patch.dict(os.environ, {"BRANDFETCH_BRAND_KEY": "test_key"}):
+        with patch.dict(os.environ, {"BRANDFETCH_API_KEY": "test_key"}):
             client = BrandfetchClient()
             # Request non-existent theme, should fall back to any logo type
             result = await client.get_brand_logo("test.com", format="svg", theme="purple", type="logo")
@@ -350,7 +350,7 @@ class TestGetBrandLogo:
             return_value=httpx.Response(200, json=mock_brand_data)
         )
         
-        with patch.dict(os.environ, {"BRANDFETCH_BRAND_KEY": "test_key"}):
+        with patch.dict(os.environ, {"BRANDFETCH_API_KEY": "test_key"}):
             client = BrandfetchClient()
             # Request non-existent type, should fall back to any logo
             result = await client.get_brand_logo("test.com", format="svg", theme="light", type="nonexistent")
@@ -364,7 +364,7 @@ class TestGetBrandLogo:
             return_value=httpx.Response(200, json=mock_brand_data)
         )
         
-        with patch.dict(os.environ, {"BRANDFETCH_BRAND_KEY": "test_key"}):
+        with patch.dict(os.environ, {"BRANDFETCH_API_KEY": "test_key"}):
             client = BrandfetchClient()
             # Request non-existent format, should fall back to first available
             result = await client.get_brand_logo("test.com", format="webp", theme="light", type="logo")
@@ -384,7 +384,7 @@ class TestGetBrandLogo:
             return_value=httpx.Response(200, json=mock_brand_data)
         )
         
-        with patch.dict(os.environ, {"BRANDFETCH_BRAND_KEY": "test_key"}):
+        with patch.dict(os.environ, {"BRANDFETCH_API_KEY": "test_key"}):
             client = BrandfetchClient()
             
             with pytest.raises(ValueError, match="No logo found"):
@@ -398,7 +398,7 @@ class TestGetBrandLogo:
         )
         
         with patch.dict(os.environ, {
-            "BRANDFETCH_BRAND_KEY": "test_key",
+            "BRANDFETCH_API_KEY": "test_key",
             "BRANDFETCH_CLIENT_ID": "test_client"
         }):
             client = BrandfetchClient()
@@ -421,7 +421,7 @@ class TestGetBrandLogo:
             return_value=httpx.Response(200, json=enhanced_mock_data)
         )
         
-        with patch.dict(os.environ, {"BRANDFETCH_BRAND_KEY": "test_key"}):
+        with patch.dict(os.environ, {"BRANDFETCH_API_KEY": "test_key"}):
             client = BrandfetchClient()
             result = await client.get_brand_logo("test.com")
             
@@ -452,7 +452,7 @@ class TestGetBrandColors:
             return_value=httpx.Response(200, json=mock_brand_data)
         )
         
-        with patch.dict(os.environ, {"BRANDFETCH_BRAND_KEY": "test_key"}):
+        with patch.dict(os.environ, {"BRANDFETCH_API_KEY": "test_key"}):
             client = BrandfetchClient()
             result = await client.get_brand_colors("test.com")
             
@@ -478,7 +478,7 @@ class TestGetBrandColors:
             return_value=httpx.Response(200, json=mock_brand_data)
         )
         
-        with patch.dict(os.environ, {"BRANDFETCH_BRAND_KEY": "test_key"}):
+        with patch.dict(os.environ, {"BRANDFETCH_API_KEY": "test_key"}):
             client = BrandfetchClient()
             result = await client.get_brand_colors("test.com")
             
@@ -497,7 +497,7 @@ class TestGetBrandColors:
             return_value=httpx.Response(200, json=mock_brand_data)
         )
         
-        with patch.dict(os.environ, {"BRANDFETCH_BRAND_KEY": "test_key"}):
+        with patch.dict(os.environ, {"BRANDFETCH_API_KEY": "test_key"}):
             client = BrandfetchClient()
             result = await client.get_brand_colors("test.com")
             
@@ -516,7 +516,7 @@ class TestDomainCleaning:
             return_value=httpx.Response(200, json=mock_response)
         )
         
-        with patch.dict(os.environ, {"BRANDFETCH_BRAND_KEY": "test_key"}):
+        with patch.dict(os.environ, {"BRANDFETCH_API_KEY": "test_key"}):
             client = BrandfetchClient()
             
             # Test comprehensive edge cases
@@ -543,7 +543,7 @@ class TestIntegration:
     async def test_real_api_call_get_brand(self):
         """Test real API call for get_brand (requires valid API key)."""
         # Skip if no real API key available
-        if not os.getenv("BRANDFETCH_BRAND_KEY") or os.getenv("BRANDFETCH_BRAND_KEY") == "your_brand_api_key_here":
+        if not os.getenv("BRANDFETCH_API_KEY") or os.getenv("BRANDFETCH_API_KEY") == "your_brand_api_key_here":
             pytest.skip("No real API key available for integration test")
         
         client = BrandfetchClient()
@@ -558,7 +558,7 @@ class TestIntegration:
     async def test_real_api_call_search_brands(self):
         """Test real API call for search_brands (requires valid API key)."""
         # Skip if no real API key available
-        if not os.getenv("BRANDFETCH_BRAND_KEY") or os.getenv("BRANDFETCH_BRAND_KEY") == "your_brand_api_key_here":
+        if not os.getenv("BRANDFETCH_API_KEY") or os.getenv("BRANDFETCH_API_KEY") == "your_brand_api_key_here":
             pytest.skip("No real API key available for integration test")
         
         client = BrandfetchClient()
@@ -576,11 +576,11 @@ class TestEdgeCases:
     
     def test_client_isolation(self):
         """Test that multiple client instances don't interfere."""
-        with patch.dict(os.environ, {"BRANDFETCH_BRAND_KEY": "key1"}):
+        with patch.dict(os.environ, {"BRANDFETCH_API_KEY": "key1"}):
             client1 = BrandfetchClient()
             assert client1.api_key == "key1"
         
-        with patch.dict(os.environ, {"BRANDFETCH_BRAND_KEY": "key2"}):
+        with patch.dict(os.environ, {"BRANDFETCH_API_KEY": "key2"}):
             client2 = BrandfetchClient()
             assert client2.api_key == "key2"
         
@@ -595,7 +595,7 @@ class TestEdgeCases:
             return_value=httpx.Response(200, text="not json")
         )
         
-        with patch.dict(os.environ, {"BRANDFETCH_BRAND_KEY": "test_key"}):
+        with patch.dict(os.environ, {"BRANDFETCH_API_KEY": "test_key"}):
             client = BrandfetchClient()
             
             with pytest.raises(Exception):  # httpx may raise various exceptions for invalid JSON
@@ -608,7 +608,7 @@ class TestEdgeCases:
             return_value=httpx.Response(200, json={})
         )
         
-        with patch.dict(os.environ, {"BRANDFETCH_BRAND_KEY": "test_key"}):
+        with patch.dict(os.environ, {"BRANDFETCH_API_KEY": "test_key"}):
             client = BrandfetchClient()
             result = await client.get_brand("test.com")
             

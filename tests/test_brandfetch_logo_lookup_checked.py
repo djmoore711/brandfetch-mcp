@@ -144,7 +144,7 @@ class TestAPICallers:
     async def test_call_logo_api_missing_key(self):
         """Test logo API call with missing API key."""
         with patch('brandfetch_mcp.brandfetch_logo_lookup_checked.LOGO_API_KEY', None):
-            with pytest.raises(RuntimeError, match="Missing BRANDFETCH_LOGO_KEY"):
+            with pytest.raises(RuntimeError, match="Missing BRANDFETCH_CLIENT_ID"):
                 await call_logo_api("apple.com")
 
     @pytest.mark.asyncio
@@ -169,7 +169,7 @@ class TestAPICallers:
     async def test_call_brand_api_search_missing_key(self):
         """Test brand API search call with missing API key."""
         with patch('brandfetch_mcp.brandfetch_logo_lookup_checked.BRAND_API_KEY', None):
-            with pytest.raises(RuntimeError, match="Missing BRANDFETCH_BRAND_KEY"):
+            with pytest.raises(RuntimeError, match="Missing BRANDFETCH_API_KEY"):
                 await call_brand_api_search("apple")
 
 
