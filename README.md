@@ -40,10 +40,10 @@ Add both to your `.env` file:
 # Get both keys from https://brandfetch.com/developers
 
 # Logo API Key (high quota, for domain lookups)
-BRANDFETCH_CLIENT_ID="your_logo_api_key_here"
+BRANDFETCH_CLIENT_ID="paste_logo_key_here"
 
 # Brand API Key (limited quota, for fallback searches)
-BRANDFETCH_API_KEY="your_brand_api_key_here"
+BRANDFETCH_API_KEY="paste_brand_key_here"
 ```
 
 ## Quickstart (one page)
@@ -66,8 +66,8 @@ BRANDFETCH_API_KEY="your_brand_api_key_here"
    ```bash
    docker build -t brandfetch-mcp .
    docker run --rm \
-     -e BRANDFETCH_CLIENT_ID=your_logo_key \
-     -e BRANDFETCH_API_KEY=your_brand_key \
+     -e BRANDFETCH_CLIENT_ID=paste_logo_key \
+     -e BRANDFETCH_API_KEY=paste_brand_key \
      brandfetch-mcp
    ```
 
@@ -79,8 +79,8 @@ BRANDFETCH_API_KEY="your_brand_api_key_here"
          "command": "uv",
          "args": ["--directory", "/absolute/path/to/brandfetch_mcp", "run", "mcp-brandfetch"],
          "env": { 
-           "BRANDFETCH_CLIENT_ID": "your_logo_key",
-           "BRANDFETCH_API_KEY": "your_brand_key"
+           "BRANDFETCH_CLIENT_ID": "paste_logo_key",
+           "BRANDFETCH_API_KEY": "paste_brand_key"
          }
        }
      }

@@ -102,7 +102,7 @@ Found 5 brands:
 
 ### Logo Response Example
 ```
-**Logo URL:** https://cdn.brandfetch.io/idxAg10C0L/theme/light/logo.svg?c=your_client_id
+**Logo URL:** https://cdn.brandfetch.io/idxAg10C0L/theme/light/logo.svg?c=paste_logo_key
 
 **Format:** svg
 **Theme:** light
