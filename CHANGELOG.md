@@ -45,12 +45,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 # export BRANDFETCH_API_KEY="your_key_here"
 
 # New way (recommended)
-export BRANDFETCH_CLIENT_ID="your_logo_key_here"
-export BRANDFETCH_API_KEY="your_brand_key_here"
+export BRANDFETCH_CLIENT_ID="paste_logo_key_here"
+export BRANDFETCH_API_KEY="paste_brand_key_here"
 
 # Or in .env file
-BRANDFETCH_CLIENT_ID=your_logo_key_here
-BRANDFETCH_API_KEY=your_brand_key_here
+BRANDFETCH_CLIENT_ID=paste_logo_key_here
+BRANDFETCH_API_KEY=paste_brand_key_here
 ```
 
 ### Security

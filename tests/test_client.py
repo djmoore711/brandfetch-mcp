@@ -543,7 +543,7 @@ class TestIntegration:
     async def test_real_api_call_get_brand(self):
         """Test real API call for get_brand (requires valid API key)."""
         # Skip if no real API key available
-        if not os.getenv("BRANDFETCH_API_KEY") or os.getenv("BRANDFETCH_API_KEY") == "your_brand_api_key_here":
+        if not os.getenv("BRANDFETCH_API_KEY") or os.getenv("BRANDFETCH_API_KEY") == "paste_brand_key_here":
             pytest.skip("No real API key available for integration test")
         
         client = BrandfetchClient()
@@ -558,7 +558,7 @@ class TestIntegration:
     async def test_real_api_call_search_brands(self):
         """Test real API call for search_brands (requires valid API key)."""
         # Skip if no real API key available
-        if not os.getenv("BRANDFETCH_API_KEY") or os.getenv("BRANDFETCH_API_KEY") == "your_brand_api_key_here":
+        if not os.getenv("BRANDFETCH_API_KEY") or os.getenv("BRANDFETCH_API_KEY") == "paste_brand_key_here":
             pytest.skip("No real API key available for integration test")
         
         client = BrandfetchClient()

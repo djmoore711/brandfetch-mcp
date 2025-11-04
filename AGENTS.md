@@ -64,7 +64,9 @@ python -c "import mcp; import httpx; import dotenv; print('All imports successfu
 cp .env.example .env
 
 # User must add their API keys manually
-# Edit .env and set: BRANDFETCH_CLIENT_ID=your_logo_key_here and BRANDFETCH_API_KEY=your_brand_key_here
+# Edit .env and set: 
+BRANDFETCH_CLIENT_ID=paste_logo_key_here
+BRANDFETCH_API_KEY=paste_brand_key_here
 ```
 
 **Important:** The user must provide their own Brandfetch API keys from https://brandfetch.com/developers
@@ -247,8 +249,8 @@ Configure Claude Desktop (~/Library/Application Support/Claude/claude_desktop_co
         "mcp-brandfetch"
       ],
       "env": {
-        "BRANDFETCH_CLIENT_ID": "your_logo_key_here",
-        "BRANDFETCH_API_KEY": "your_brand_key_here"
+        "BRANDFETCH_CLIENT_ID": "paste_logo_key_here",
+        "BRANDFETCH_API_KEY": "paste_brand_key_here"
       }
     }
   }
