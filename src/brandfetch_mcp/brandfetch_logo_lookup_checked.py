@@ -21,7 +21,7 @@ import os
 import re
 import json
 import sqlite3
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
 import logging
@@ -95,7 +95,7 @@ def _get_conn() -> sqlite3.Connection:
 
 def get_brand_count() -> int:
     """Get current month's Brand API usage count."""
-    month = datetime.utcnow().strftime("%Y-%m")
+    month = datetime.now(timezone.utc).strftime("%Y-%m")
     conn = _get_conn()
     cur = conn.cursor()
     cur.execute("SELECT count FROM brand_api_usage WHERE month = ?", (month,))
@@ -106,7 +106,7 @@ def get_brand_count() -> int:
 
 def increment_brand_counter(delta: int = 1) -> int:
     """Increment Brand API usage counter and return new count."""
-    month = datetime.utcnow().strftime("%Y-%m")
+    month = datetime.now(timezone.utc).strftime("%Y-%m")
     conn = _get_conn()
     with conn:
         cur = conn.execute("SELECT count FROM brand_api_usage WHERE month = ?", (month,))
@@ -411,7 +411,7 @@ async def get_logo_for_domain(domain: str, company_hint: Optional[str] = None) -
 def get_status() -> Dict[str, Any]:
     """Get current usage status."""
     current_count = get_brand_count()
-    month = datetime.utcnow().strftime("%Y-%m")
+    month = datetime.now(timezone.utc).strftime("%Y-%m")
     
     return {
         "brand_api_calls_this_month": current_count,

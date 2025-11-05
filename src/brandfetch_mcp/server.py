@@ -412,7 +412,15 @@ def main():
         from mcp.types import InitializationOptions
         
         async with stdio_server() as (read_stream, write_stream):
-            await app.run(read_stream, write_stream, InitializationOptions())
+            try:
+                await app.run(read_stream, write_stream, InitializationOptions())
+            finally:
+                # Clean up HTTP client resources if client was successfully initialized
+                try:
+                    await brandfetch.close()
+                    logger.info("Brandfetch client cleaned up")
+                except Exception as e:
+                    logger.warning(f"Error during client cleanup: {e}")
     
     asyncio.run(run_server())
 
