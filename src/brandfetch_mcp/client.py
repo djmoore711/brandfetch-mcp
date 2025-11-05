@@ -14,13 +14,23 @@ class BrandfetchClient:
         self.api_key = os.getenv("BRANDFETCH_API_KEY")
         self.client_id = os.getenv("BRANDFETCH_CLIENT_ID")
         
-        if not self.api_key:
+        if not self.api_key or not self.api_key.strip():
             raise ValueError("BRANDFETCH_API_KEY must be set in .env")
+        
+
         
         self.headers = {
             "Authorization": f"Bearer {self.api_key}",
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "User-Agent": "Brandfetch-MCP/0.2.0",
         }
+        # Create a transport with retries
+        transport = httpx.AsyncHTTPTransport(retries=3)
+        self.client = httpx.AsyncClient(transport=transport, headers=self.headers, timeout=30.0)
+
+    async def close(self):
+        """Close the underlying HTTP client."""
+        await self.client.aclose()
 
     def _append_client_id(self, url: str) -> str:
         """
@@ -47,6 +57,9 @@ class BrandfetchClient:
         # Strip whitespace from input first
         domain = domain.strip()
         
+        if not domain:
+            raise ValueError("Domain cannot be empty")
+        
         # Parse URL to extract domain properly
         parsed = urlparse(domain)
         clean_domain = parsed.netloc or parsed.path  # netloc for URLs, path for plain domains
@@ -56,33 +69,70 @@ class BrandfetchClient:
             clean_domain = clean_domain[4:]  # Remove "www."
         clean_domain = clean_domain.lower()
         
-        return clean_domain.strip("/")  # Only strip slashes now
+        # Validate domain format
+        clean_domain = clean_domain.strip("/")
+        if not clean_domain or "." not in clean_domain:
+            raise ValueError(f"Invalid domain format: {domain}")
+        
+        return clean_domain
 
     async def get_brand(self, domain: str) -> Dict[str, Any]:
         """Retrieve comprehensive brand data for a domain."""
         # Clean domain input
         domain = self._clean_domain(domain)
         
-        async with httpx.AsyncClient() as client:
-            response = await client.get(
+        try:
+            response = await self.client.get(
                 f"{self.base_url}/brands/{domain}",
-                headers=self.headers,
-                timeout=30.0,
             )
             response.raise_for_status()
             return response.json()
+        except httpx.HTTPStatusError as e:
+            if e.response.status_code == 404:
+                raise ValueError(f"Brand not found for domain: {domain}") from e
+            elif e.response.status_code == 401:
+                raise ValueError("Invalid API key. Check BRANDFETCH_API_KEY.") from e
+            elif e.response.status_code == 429:
+                raise ValueError("Rate limit exceeded. Try again later.") from e
+            else:
+                raise ValueError(f"API error {e.response.status_code}: {e.response.text}") from e
+        except httpx.TimeoutException:
+            raise ValueError(f"Request timeout for domain: {domain}") from None
+        except Exception as e:
+            raise ValueError(f"Unexpected error: {str(e)}") from e
 
     async def search_brands(self, query: str, limit: int = 10) -> List[Dict[str, Any]]:
-        """Search for brands by name or keyword."""
-        async with httpx.AsyncClient() as client:
-            response = await client.get(
+        """Search for brands by name or keyword.
+        
+        Note: The search endpoint requires a Brandfetch Pro subscription.
+        Free tier accounts only have access to individual brand lookups.
+        """
+        try:
+            response = await self.client.get(
                 f"{self.base_url}/search",
-                headers=self.headers,
                 params={"q": query, "limit": min(limit, 50)},
-                timeout=30.0,
             )
             response.raise_for_status()
             return response.json()
+        except httpx.HTTPStatusError as e:
+            if e.response.status_code == 400:
+                raise ValueError("Invalid search query") from e
+            elif e.response.status_code == 401:
+                raise ValueError("Invalid API key. Check BRANDFETCH_API_KEY.") from e
+            elif e.response.status_code == 403:
+                raise ValueError(
+                    "Search endpoint requires Brandfetch Pro subscription. "
+                    "Free tier accounts only support individual brand lookups. "
+                    "Upgrade at https://brandfetch.com/pricing"
+                ) from e
+            elif e.response.status_code == 429:
+                raise ValueError("Rate limit exceeded. Try again later.") from e
+            else:
+                raise ValueError(f"API error {e.response.status_code}: {e.response.text}") from e
+        except httpx.TimeoutException:
+            raise ValueError("Search request timed out") from None
+        except Exception as e:
+            raise ValueError(f"Unexpected error: {str(e)}") from e
 
     async def get_brand_logo(self, domain: str, format: str = "svg", theme: str = "light", type: str = "logo") -> Dict[str, Any]:
         """Retrieve brand logo in specified format."""
@@ -90,7 +140,10 @@ class BrandfetchClient:
         domain = self._clean_domain(domain)
         
         # Get brand data first
-        brand_data = await self.get_brand(domain)
+        try:
+            brand_data = await self.get_brand(domain)
+        except ValueError as e:
+            raise e  # Re-raise the error from get_brand
         
         # Find the best matching logo
         logos = brand_data.get("logos", [])
@@ -150,7 +203,10 @@ class BrandfetchClient:
         domain = self._clean_domain(domain)
         
         # Get brand data first
-        brand_data = await self.get_brand(domain)
+        try:
+            brand_data = await self.get_brand(domain)
+        except ValueError as e:
+            raise e  # Re-raise the error from get_brand
         
         # Return colors with additional metadata
         colors = brand_data.get("colors", [])

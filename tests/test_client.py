@@ -3,7 +3,12 @@ import os
 import httpx
 from unittest.mock import patch
 import respx
+from dotenv import load_dotenv
 from brandfetch_mcp.client import BrandfetchClient
+
+
+# Ensure environment variables from .env are loaded before tests evaluate skip conditions
+load_dotenv()
 
 
 class TestBrandfetchClientInit:
@@ -166,7 +171,7 @@ class TestGetBrand:
                 return_value=httpx.Response(404, json={"error": "Not found"})
             )
             
-            with pytest.raises(httpx.HTTPStatusError):
+            with pytest.raises(ValueError, match="Brand not found for domain: notfound.com"):
                 await client.get_brand("notfound.com")
             
             # Test 401 error
@@ -174,7 +179,7 @@ class TestGetBrand:
                 return_value=httpx.Response(401, json={"error": "Unauthorized"})
             )
             
-            with pytest.raises(httpx.HTTPStatusError):
+            with pytest.raises(ValueError, match="Invalid API key. Check BRANDFETCH_API_KEY."):
                 await client.get_brand("unauthorized.com")
             
             # Test 429 rate limit
@@ -182,7 +187,7 @@ class TestGetBrand:
                 return_value=httpx.Response(429, json={"error": "Rate limit exceeded"})
             )
             
-            with pytest.raises(httpx.HTTPStatusError):
+            with pytest.raises(ValueError, match="Rate limit exceeded. Try again later."):
                 await client.get_brand("ratelimited.com")
     
     @respx.mock
@@ -196,7 +201,7 @@ class TestGetBrand:
                 side_effect=httpx.TimeoutException("Request timeout")
             )
             
-            with pytest.raises(httpx.TimeoutException):
+            with pytest.raises(ValueError, match="Request timeout for domain: slow.com"):
                 await client.get_brand("slow.com")
 
 
@@ -542,13 +547,16 @@ class TestIntegration:
     
     async def test_real_api_call_get_brand(self):
         """Test real API call for get_brand (requires valid API key)."""
-        # Skip if no real API key available
-        if not os.getenv("BRANDFETCH_API_KEY") or os.getenv("BRANDFETCH_API_KEY") == "paste_brand_key_here":
-            pytest.skip("No real API key available for integration test")
+        api_key = os.getenv("BRANDFETCH_API_KEY")
+        if not api_key or api_key == "paste_brand_key_here":
+            pytest.fail("BRANDFETCH_API_KEY must be set to a real value for integration tests")
         
         client = BrandfetchClient()
-        result = await client.get_brand("github.com")
-        
+        try:
+            result = await client.get_brand("github.com")
+        finally:
+            await client.close()
+
         assert "name" in result
         assert "domain" in result
         assert result["domain"] == "github.com"
@@ -557,18 +565,23 @@ class TestIntegration:
     
     async def test_real_api_call_search_brands(self):
         """Test real API call for search_brands (requires valid API key)."""
-        # Skip if no real API key available
-        if not os.getenv("BRANDFETCH_API_KEY") or os.getenv("BRANDFETCH_API_KEY") == "paste_brand_key_here":
-            pytest.skip("No real API key available for integration test")
-        
+        api_key = os.getenv("BRANDFETCH_API_KEY")
+        if not api_key or api_key == "paste_brand_key_here":
+            pytest.fail("BRANDFETCH_API_KEY must be set to a real value for integration tests")
+
         client = BrandfetchClient()
-        results = await client.search_brands("coffee", limit=3)
-        
-        assert isinstance(results, list)
-        assert len(results) <= 3
-        if results:
-            assert "name" in results[0]
-            assert "domain" in results[0]
+        try:
+            results = await client.search_brands("coffee", limit=3)
+            
+            assert isinstance(results, list)
+            assert len(results) <= 3
+            if results:
+                assert "name" in results[0]
+                assert "domain" in results[0]
+        except ValueError as e:
+            assert "Brandfetch Pro subscription" in str(e)
+        finally:
+            await client.close()
 
 
 class TestEdgeCases:
