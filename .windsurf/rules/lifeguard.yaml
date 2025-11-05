@@ -1,0 +1,88 @@
+# Lifeguard Custom Rules for Brandfetch MCP
+# Category: Security, Reliability, and MCP-Specific
+# Severity: error | warn | info
+
+rules:
+
+  # --- Security Rules ---
+  - name: "No hardcoded secrets or tokens"
+    severity: error
+    description: "Scan for any API keys or credentials committed to code. Enforce use of environment variables or secure secrets stores."
+    pattern: |
+      (BRANDFETCH_LOGO_KEY|BRANDFETCH_BRAND_KEY)\s*=\s*['"][\w-]+['"]
+
+  - name: "Logging must not expose sensitive data"
+    severity: error
+    description: "Detect log or print statements that include API keys, secrets, or full response payloads."
+    pattern: |
+      logger\.(debug|info|warning)\(.*(API_KEY|SECRET|TOKEN|PASSWORD|response\.text).*\)
+
+  - name: "Exception handling must not reveal internals"
+    severity: error
+    description: "Ensure stack traces or system paths are not returned to users in API responses."
+
+  - name: "Dependency versions must be pinned and audited"
+    severity: warn
+    description: "Ensure dependencies are version-pinned in requirements or pyproject.lock and that 'pip-audit' runs in CI."
+
+  - name: "Environment variables containing secrets must not be printed or logged"
+    severity: error
+    description: "Prevent log or print statements referencing sensitive env vars like API_KEY, SECRET, TOKEN, or PASSWORD."
+
+  # --- Reliability & Maintainability Rules ---
+  - name: "Database transactions must be properly handled"
+    severity: error
+    description: "Ensure all SQLite transactions are wrapped with proper commit/rollback handling."
+
+  - name: "API responses must include proper error context"
+    severity: warn
+    description: "Error responses must include structured context (error type, request ID, domain) without exposing sensitive data."
+
+  - name: "Async operations must have timeout handling"
+    severity: error
+    description: "All httpx calls must include a timeout parameter to prevent hanging requests."
+    pattern: |
+      httpx\.\w+\(
+        [^)]*
+        (?!.*timeout=)
+      )
+
+  - name: "Service dependencies must define resilience strategies"
+    severity: warn
+    description: "External calls (Brandfetch API, DB, etc.) should include retry/backoff strategies to handle transient failures."
+
+  - name: "Unit and integration tests must assert both success and failure scenarios"
+    severity: info
+    description: "Ensure tests include both positive and negative paths for major functions."
+
+  # --- MCP-Specific Rules ---
+  - name: "Brand API quota must be checked before fallback"
+    severity: error
+    description: "Verify that any Brandfetch API call checks the monthly usage counter before execution and handles quota exhaustion gracefully."
+    scope:
+      files:
+        - "src/brandfetch_mcp/brandfetch_logo_lookup_checked.py"
+      functions:
+        - "get_logo_for_domain"
+
+  - name: "SQLite access must be thread-safe"
+    severity: error
+    description: "Confirm SQLite connections include check_same_thread=False to support concurrent MCP requests."
+    pattern: |
+      sqlite3\.connect\(
+        [^)]*
+        (?!.*check_same_thread\s*=\s*False)
+      )
+
+  - name: "Environment variables must be validated at startup"
+    severity: error
+    description: "Validate all required env vars (BRANDFETCH_LOGO_KEY, BRANDFETCH_BRAND_KEY) during startup."
+    pattern: |
+      (?!.*(BRANDFETCH_LOGO_KEY|BRANDFETCH_BRAND_KEY).*if\s+not\s+os\.getenv)
+
+  - name: "Brandfetch domain normalization must be applied consistently"
+    severity: warn
+    description: "Verify all domain inputs pass through _normalize_domain() before processing."
+    pattern: |
+      (?!.*_normalize_domain)
+      (domain\s*=\s*[\'\"]?[a-zA-Z0-9\.\-]+[\'\"]?)

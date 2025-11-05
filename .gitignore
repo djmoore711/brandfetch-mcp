@@ -26,6 +26,7 @@ eggs/
 # Virtualenvs
 .venv/
 venv/
+<<<<<<< HEAD
 env/
 ENV/
 
@@ -109,3 +110,7 @@ __pypackages__/
 
 # Documentation
 _build/
+=======
+wheels/
+brand_api_usage.db
+>>>>>>> 16e599a (chore: add Windsurf config; ignore local brand_api_usage.db)
