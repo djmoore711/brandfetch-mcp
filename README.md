@@ -109,6 +109,53 @@ curl -H "Authorization: Bearer YOUR_KEY" https://api.brandfetch.io/v2/brands/git
 - "Get a logo URL for github.com" (fast domain lookup)
 - "Find the logo for GitHub" (name search with heuristics)
 
+## Testing Workflow
+
+### Automated Testing
+```bash
+# Run all tests
+pytest tests/
+
+# Run specific test file
+pytest tests/test_client.py -v
+```
+
+### Manual Verification
+1. Start the MCP server:
+   ```bash
+   uv run mcp-brandfetch
+   ```
+2. In a new terminal, test with MCP Inspector:
+   ```bash
+   npx @modelcontextprotocol/inspector uv --directory $(pwd) run mcp-brandfetch
+   ```
+3. Verify basic functionality:
+   ```bash
+   # Health check
+   curl http://localhost:8000/health
+   
+   # Brand lookup
+   curl -X POST http://localhost:8000/mcp \
+     -H "Content-Type: application/json" \
+     -d '{"method":"get_brand_details","params":{"domain":"github.com"}}'
+   ```
+
+### Tools Integration
+
+#### Windsurf
+1. Ensure MCP server is running
+2. Open MCP tools panel
+3. Connect to `localhost:8000`
+4. Test with example queries
+
+#### Goose
+1. Add new MCP server connection
+2. Configure:
+   - Host: `localhost`
+   - Port: `8000`
+   - Path: Project directory
+3. Save and test connection
+
 ## Contributing
 
 1. Fork the repository

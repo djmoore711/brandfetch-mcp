@@ -409,10 +409,21 @@ def main():
     async def run_server():
         """Run the MCP server."""
         from mcp.server.stdio import stdio_server
-        from mcp.types import InitializationOptions
+        from mcp.server import InitializationOptions
+        from mcp.types import ServerCapabilities, ToolsCapability
         
         async with stdio_server() as (read_stream, write_stream):
-            await app.run(read_stream, write_stream, InitializationOptions())
+            await app.run(
+                read_stream, 
+                write_stream, 
+                InitializationOptions(
+                    server_name="brandfetch",
+                    server_version="0.2.0",
+                    capabilities=ServerCapabilities(
+                        tools=ToolsCapability()
+                    )
+                )
+            )
     
     asyncio.run(run_server())
 
