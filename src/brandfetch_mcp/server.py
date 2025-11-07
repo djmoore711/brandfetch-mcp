@@ -409,8 +409,7 @@ def main():
     async def run_server():
         """Run the MCP server."""
         from mcp.server.stdio import stdio_server
-        from mcp.server import InitializationOptions
-        from mcp.types import ServerCapabilities, ToolsCapability
+        from mcp.types import InitializationOptions, ServerCapabilities, ToolsCapability
         
         async with stdio_server() as (read_stream, write_stream):
             await app.run(
