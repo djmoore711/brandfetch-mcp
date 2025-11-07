@@ -1,6 +1,16 @@
-# Brandfetch MCP Server
+<div align="center">
 
-[![Project Status](https://img.shields.io/badge/status-active-success.svg)]()
+<img src="https://img.shields.io/badge/status-work--in--progress-yellow.svg" alt="WIP">
+
+<h1>🚧 WORK IN PROGRESS</h1>
+<p>This project is under active development.<br>
+Expect frequent updates and breaking changes.</p>
+
+<hr>
+
+</div>
+
+# Brandfetch MCP Server
 
 Model Context Protocol (MCP) server that lets AI assistants fetch logos, colors, fonts, and company info from the Brandfetch API.
 
